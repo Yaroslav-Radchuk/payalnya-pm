@@ -4,13 +4,17 @@ import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 import { useI18n } from 'vue-i18n'
+import type { Task } from '@/types'
+import { TaskStatus } from '@/types'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseSelect from '@/components/common/BaseSelect.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { useTasksStore } from '@/stores/tasks'
-import { TaskStatus } from '@/types'
 
-interface Props { projectId: number }
+interface Props {
+  projectId: number
+  task?: Task
+}
 
 const props = defineProps<Props>()
 const emit = defineEmits<{ close: [] }>()
@@ -33,12 +37,25 @@ const schema = computed(() =>
       dueDate: z
         .string()
         .min(1, t('taskForm.dateRequired'))
-        .refine((d) => d >= today, t('taskForm.datePast')),
+        .refine(
+          (d) => d >= today || (props.task != null && d === props.task.dueDate),
+          t('taskForm.datePast'),
+        ),
     }),
   ),
 )
 
-const { handleSubmit, resetForm } = useForm({ validationSchema: schema })
+const { handleSubmit, resetForm } = useForm({
+  validationSchema: schema,
+  initialValues: props.task
+    ? {
+        name: props.task.name,
+        status: props.task.status,
+        assignee: props.task.assignee ?? '',
+        dueDate: props.task.dueDate,
+      }
+    : {},
+})
 
 const {
   value: name,
@@ -76,14 +93,25 @@ const assigneeOptions = computed(() => [
 
 const onSubmit = handleSubmit(async (values) => {
   submitting.value = true
+
   try {
-    await store.create({
-      projectId: props.projectId,
-      name: values.name,
-      status: values.status as TaskStatus,
-      assignee: values.assignee || null,
-      dueDate: values.dueDate,
-    })
+    if (props.task) {
+      await store.update(props.task.id, {
+        name: values.name,
+        status: values.status as TaskStatus,
+        assignee: values.assignee || null,
+        dueDate: values.dueDate,
+      })
+    } else {
+      await store.create({
+        projectId: props.projectId,
+        name: values.name,
+        status: values.status as TaskStatus,
+        assignee: values.assignee || null,
+        dueDate: values.dueDate,
+      })
+    }
+
     resetForm()
     emit('close')
   } finally {

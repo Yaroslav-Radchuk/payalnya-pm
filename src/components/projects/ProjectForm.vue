@@ -4,10 +4,16 @@ import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 import { useI18n } from 'vue-i18n'
+import type { Project } from '@/types'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import { useProjectsStore } from '@/stores/projects'
 
+interface Props {
+  project?: Project
+}
+
+const props = defineProps<Props>()
 const emit = defineEmits<{ close: [] }>()
 const store = useProjectsStore()
 const submitting = ref(false)
@@ -22,7 +28,15 @@ const schema = computed(() =>
   ),
 )
 
-const { handleSubmit } = useForm({ validationSchema: schema })
+const { handleSubmit } = useForm({
+  validationSchema: schema,
+  initialValues: props.project
+    ? {
+        name: props.project.name,
+        description: props.project.description ?? '',
+      }
+    : {},
+})
 
 const {
   value: name,
@@ -34,8 +48,18 @@ const { value: description, handleBlur: blurDesc } = useField<string>('descripti
 
 const onSubmit = handleSubmit(async (values) => {
   submitting.value = true
+
   try {
-    await store.create({ name: values.name, description: values.description })
+    if (props.project) {
+      await store.update(
+        props.project.id,
+        { name: values.name, description: values.description },
+        'toast.projectUpdated',
+      )
+    } else {
+      await store.create({ name: values.name, description: values.description })
+    }
+
     emit('close')
   } finally {
     submitting.value = false

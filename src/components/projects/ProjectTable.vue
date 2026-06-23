@@ -13,6 +13,8 @@ import { useProjectsStore } from '@/stores/projects'
 import StatusPill from '@/components/common/StatusPill.vue'
 import BaseSelect from '@/components/common/BaseSelect.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import BaseModal from '@/components/common/BaseModal.vue'
+import ProjectForm from '@/components/projects/ProjectForm.vue'
 
 interface Props { projects: Project[] }
 
@@ -42,7 +44,7 @@ const { widths, startResize } = useColumnResize({
   taskCount: 120,
   status: 120,
   createdAt: 160,
-  actions: 100,
+  actions: 140,
 })
 
 const statusOptions = computed(() => [
@@ -53,6 +55,7 @@ const statusOptions = computed(() => [
 
 const deletingId = ref<number | null>(null)
 const archivingId = ref<number | null>(null)
+const editingProject = ref<Project | null>(null)
 
 async function confirmDelete(e: MouseEvent, id: number) {
   e.stopPropagation()
@@ -213,6 +216,15 @@ async function toggleArchive(e: MouseEvent, project: Project) {
                 <BaseButton
                   variant="ghost"
                   size="sm"
+                  @click="editingProject = p"
+                >
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M8.5 1.5a1.414 1.414 0 0 1 2 2L3.5 10.5l-3 .5.5-3 7.5-7Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </BaseButton>
+                <BaseButton
+                  variant="ghost"
+                  size="sm"
                   :loading="archivingId === p.id"
                   :title="p.status === 'active' ? t('table.projects.archive') : t('table.projects.restore')"
                   @click="toggleArchive($event, p)"
@@ -248,6 +260,19 @@ async function toggleArchive(e: MouseEvent, project: Project) {
       </table>
     </div>
   </div>
+
+  <BaseModal
+    :model-value="editingProject !== null"
+    :title="t('project.editProject')"
+    @update:model-value="editingProject = null"
+  >
+    <ProjectForm
+      v-if="editingProject"
+      :key="editingProject.id"
+      :project="editingProject"
+      @close="editingProject = null"
+    />
+  </BaseModal>
 </template>
 
 <style scoped lang="scss">
@@ -392,14 +417,15 @@ async function toggleArchive(e: MouseEvent, project: Project) {
     }
 
     &--actions {
-      padding-block: var(--spacing-8);
+      padding: var(--spacing-8);
     }
   }
 
   &__actions-wrap {
     display: flex;
     align-items: center;
-    gap: var(--spacing-6);
+    justify-content: center;
+    gap: 4px;
   }
 
   &__empty {

@@ -29,6 +29,8 @@ export default {
     backTo: 'Проекти',
     addTask: 'Додати завдання',
     newTask: 'Нове завдання',
+    editTask: 'Редагувати завдання',
+    editProject: 'Редагувати проект',
     viewTable: 'Таблиця',
     viewKanban: 'Канбан',
   },
@@ -119,6 +121,7 @@ export default {
     projectRestored: 'Проект відновлено',
     projectDeleted: 'Проект видалено',
     taskCreated: 'Завдання успішно додано',
+    taskUpdated: 'Завдання оновлено',
     taskDeleted: 'Завдання видалено',
   },
 }

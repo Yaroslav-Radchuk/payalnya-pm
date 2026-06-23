@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
 import type { Task } from '@/types'
@@ -14,10 +14,13 @@ import { useTasksStore } from '@/stores/tasks'
 import StatusPill from '@/components/common/StatusPill.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseSelect from '@/components/common/BaseSelect.vue'
+import BaseModal from '@/components/common/BaseModal.vue'
+import TaskForm from '@/components/tasks/TaskForm.vue'
 
 interface Props { tasks: Task[] }
 
 const props = defineProps<Props>()
+const editingTask = ref<Task | null>(null)
 const store = useTasksStore()
 const { onTableReorder } = useTaskDrag()
 const { t } = useI18n()
@@ -42,7 +45,7 @@ const { widths, startResize } = useColumnResize({
   assignee: 160,
   status: 130,
   dueDate: 140,
-  actions: 70,
+  actions: 96,
 })
 
 const statusOptions = computed(() => [
@@ -52,10 +55,16 @@ const statusOptions = computed(() => [
   { value: TaskStatus.Done, label: t('kanban.done') },
 ])
 
-const draggableList = computed({
-  get: () => filtered.value,
-  set: (newList: Task[]) => onTableReorder(newList),
+const draggableList = ref<Task[]>([...filtered.value])
+
+watch(filtered, (newFiltered) => {
+  draggableList.value = [...newFiltered]
 })
+
+function handleDrop(newList: Task[]): void {
+  draggableList.value = newList
+  onTableReorder(newList)
+}
 
 async function removeTask(id: number) {
   const ok = await confirm({
@@ -147,17 +156,18 @@ function isPast(d: string) {
                 @mousedown.stop="startResize('dueDate', $event)"
               />
             </th>
-            <th :style="{ width: widths.actions + 'px' }" class="task-table__th" />
+            <th :style="{ width: widths.actions + 'px' }" class="task-table__th task-table__th--actions" />
           </tr>
         </thead>
         <draggable
-          v-model="draggableList"
+          :model-value="draggableList"
           tag="tbody"
           item-key="id"
           handle=".task-table__drag"
           ghost-class="sortable-ghost"
           chosen-class="sortable-chosen"
           animation="200"
+          @update:model-value="handleDrop"
         >
           <template #item="{ element: task }">
             <tr class="task-table__row">
@@ -178,15 +188,26 @@ function isPast(d: string) {
                 {{ formatDate(task.dueDate) }}
               </td>
               <td class="task-table__td task-table__td--actions">
-                <BaseButton
-                  variant="danger"
-                  size="sm"
-                  @click="removeTask(task.id)"
-                >
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M1 3h10M4 3V2h4v1M2 3l.5 7h7L10 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </BaseButton>
+                <div class="task-table__action-wrap">
+                  <BaseButton
+                    variant="ghost"
+                    size="sm"
+                    @click="editingTask = task"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M8.5 1.5a1.414 1.414 0 0 1 2 2L3.5 10.5l-3 .5.5-3 7.5-7Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </BaseButton>
+                  <BaseButton
+                    variant="danger"
+                    size="sm"
+                    @click="removeTask(task.id)"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M1 3h10M4 3V2h4v1M2 3l.5 7h7L10 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </BaseButton>
+                </div>
               </td>
             </tr>
           </template>
@@ -196,6 +217,20 @@ function isPast(d: string) {
         </tbody>
       </table>
     </div>
+
+    <BaseModal
+      :model-value="editingTask !== null"
+      :title="t('project.editTask')"
+      @update:model-value="editingTask = null"
+    >
+      <TaskForm
+        v-if="editingTask"
+        :key="editingTask.id"
+        :project-id="editingTask.projectId"
+        :task="editingTask"
+        @close="editingTask = null"
+      />
+    </BaseModal>
   </div>
 </template>
 
@@ -332,7 +367,24 @@ function isPast(d: string) {
 
     &--actions {
       padding-block: var(--spacing-8);
+      overflow: visible;
+      position: sticky;
+      right: 0;
+      background: var(--color-slate);
     }
+  }
+
+  &__th--actions {
+    position: sticky;
+    right: 0;
+    background: var(--color-slate);
+    z-index: 1;
+  }
+
+  &__action-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   &__drag {

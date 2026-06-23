@@ -29,6 +29,8 @@ export default {
     backTo: 'Projects',
     addTask: 'Add task',
     newTask: 'New task',
+    editTask: 'Edit task',
+    editProject: 'Edit project',
     viewTable: 'Table',
     viewKanban: 'Kanban',
   },
@@ -119,6 +121,7 @@ export default {
     projectRestored: 'Project restored',
     projectDeleted: 'Project deleted',
     taskCreated: 'Task added successfully',
+    taskUpdated: 'Task updated',
     taskDeleted: 'Task deleted',
   },
 }

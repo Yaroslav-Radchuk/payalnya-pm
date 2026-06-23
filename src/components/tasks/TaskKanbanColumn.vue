@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
 import type { Task } from '@/types'
@@ -10,6 +10,7 @@ import TaskKanbanCard from './TaskKanbanCard.vue'
 interface Props { status: TaskStatus; tasks: Task[] }
 
 const props = defineProps<Props>()
+const emit = defineEmits<{ edit: [task: Task] }>()
 const { onKanbanChange } = useTaskDrag()
 const { t } = useI18n()
 
@@ -19,10 +20,19 @@ const labelKey: Record<TaskStatus, string> = {
   [TaskStatus.Done]: 'kanban.done',
 }
 
-const localList = computed({
-  get: () => props.tasks,
-  set: (newList: Task[]) => onKanbanChange(props.status, newList),
-})
+const localList = ref<Task[]>([...props.tasks])
+
+watch(
+  () => props.tasks,
+  (newTasks) => {
+    localList.value = [...newTasks]
+  },
+)
+
+function handleDrop(newList: Task[]): void {
+  localList.value = newList
+  onKanbanChange(props.status, newList)
+}
 </script>
 
 <template>
@@ -32,16 +42,17 @@ const localList = computed({
       <span class="kanban-col__count tnum">{{ tasks.length }}</span>
     </div>
     <draggable
-      v-model="localList"
+      :model-value="localList"
       :group="{ name: 'tasks' }"
       item-key="id"
       ghost-class="sortable-ghost"
       chosen-class="sortable-chosen"
       animation="200"
       class="kanban-col__list"
+      @update:model-value="handleDrop"
     >
       <template #item="{ element }">
-        <TaskKanbanCard :task="element" />
+        <TaskKanbanCard :task="element" @edit="emit('edit', $event)" />
       </template>
     </draggable>
   </div>

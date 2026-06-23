@@ -11,6 +11,7 @@ interface Props {
 }
 
 defineProps<Props>()
+const emit = defineEmits<{ edit: [task: Task] }>()
 const store = useTasksStore()
 const { t } = useI18n()
 const { confirm } = useConfirm()
@@ -32,9 +33,14 @@ async function removeTask(id: number) {
   <div class="kanban-card">
     <div class="kanban-card__header">
       <span class="kanban-card__id tnum">{{ task.id }}</span>
-      <button class="kanban-card__del" @click.stop="removeTask(task.id)">
-        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-      </button>
+      <div class="kanban-card__actions">
+        <button class="kanban-card__btn" @click.stop="emit('edit', task)">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M8.5 1.5a1.414 1.414 0 0 1 2 2L3.5 10.5l-3 .5.5-3 7.5-7Z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="kanban-card__del" @click.stop="removeTask(task.id)">
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </button>
+      </div>
     </div>
     <p class="kanban-card__name">{{ task.name }}</p>
     <div class="kanban-card__footer">
@@ -78,6 +84,12 @@ async function removeTask(id: number) {
     color: var(--color-ash);
   }
 
+  &__actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__btn,
   &__del {
     background: transparent;
     border: none;
@@ -86,10 +98,14 @@ async function removeTask(id: number) {
     border-radius: 2px;
     transition: color var(--transition-fast);
     display: flex;
+  }
 
-    &:hover {
-      color: #e05252;
-    }
+  &__btn:hover {
+    color: var(--color-pearl);
+  }
+
+  &__del:hover {
+    color: #e05252;
   }
 
   &__name {

@@ -68,6 +68,8 @@ export const useTasksStore = defineStore('tasks', () => {
     if (idx !== -1) {
       items.value[idx] = updated
     }
+
+    toast.success(t('toast.taskUpdated'))
   }
 
   async function remove(id: number): Promise<void> {
@@ -87,14 +89,11 @@ export const useTasksStore = defineStore('tasks', () => {
 
   async function reorder(reordered: Task[]): Promise<void> {
     const patches = reordered.map((t, i) => ({ ...t, order: i }))
-    patches.forEach((t) => {
-      const idx = items.value.findIndex((x) => x.id === t.id)
+    const patchIds = new Set(patches.map((t) => t.id))
+    const others = items.value.filter((t) => !patchIds.has(t.id))
 
-      if (idx !== -1) {
-        items.value[idx] = t
-      }
-    })
-    
+    items.value = [...patches, ...others]
+
     await Promise.all(patches.map((t) => tasksApi.update(t.id, { order: t.order, status: t.status })))
   }
 
