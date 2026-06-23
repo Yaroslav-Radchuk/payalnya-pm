@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background -->
+  <rect width="32" height="32" rx="7" fill="#08080a"/>
+
+  <!-- Handle (thick, upper-right) -->
+  <line x1="26" y1="6" x2="18" y2="14" stroke="#cc9166" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Grip grooves cut into handle (background-colored stripes) -->
+  <line x1="24" y1="7.5" x2="25.5" y2="6" stroke="#08080a" stroke-width="1.2"/>
+  <line x1="22" y1="9.5" x2="23.5" y2="8" stroke="#08080a" stroke-width="1.2"/>
+  <line x1="20" y1="11.5" x2="21.5" y2="10" stroke="#08080a" stroke-width="1.2"/>
+
+  <!-- Heating element collar (medium width) -->
+  <line x1="18" y1="14" x2="13" y2="19" stroke="#cc9166" stroke-width="2.5" stroke-linecap="butt"/>
+
+  <!-- Tip (tapers to point) -->
+  <line x1="13" y1="19" x2="8" y2="24" stroke="#cc9166" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Solder drop at tip -->
+  <circle cx="7" cy="25" r="2.2" fill="#cc9166"/>
+  <circle cx="7" cy="25" r="1" fill="#fff0cc" opacity="0.5"/>
+
+  <!-- Heat waves near tip -->
+  <path d="M 11 17 Q 8.5 15 11 13" stroke="#ae9357" stroke-width="0.9" stroke-linecap="round" opacity="0.65"/>
+  <path d="M 14 14 Q 11.5 12 14 10" stroke="#ae9357" stroke-width="0.9" stroke-linecap="round" opacity="0.38"/>
+</svg>
