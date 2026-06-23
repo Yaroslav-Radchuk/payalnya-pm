@@ -2,7 +2,7 @@
 
 SPA для управління проектами і завданнями. Дизайн у стилі Slash — темна тема, obsidian + ember gold.
 
-**[→ Демо](https://payalnya-k9u2iw23h-yaroslav-radchuks-projects.vercel.app/#/)**
+**[→ Демо](https://payalnya-pm.vercel.app/#/)**
 
 ---
 
