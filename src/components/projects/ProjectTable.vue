@@ -133,6 +133,7 @@ async function toggleArchive(e: MouseEvent, project: Project) {
       <BaseSelect
         :model-value="extra.status ?? ''"
         :options="statusOptions"
+        :aria-label="t('table.projects.status')"
         @update:model-value="setExtra('status', $event)"
       />
     </div>
@@ -216,6 +217,7 @@ async function toggleArchive(e: MouseEvent, project: Project) {
                 <BaseButton
                   variant="ghost"
                   size="sm"
+                  :aria-label="t('project.editProject')"
                   @click="editingProject = p"
                 >
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -226,7 +228,7 @@ async function toggleArchive(e: MouseEvent, project: Project) {
                   variant="ghost"
                   size="sm"
                   :loading="archivingId === p.id"
-                  :title="p.status === 'active' ? t('table.projects.archive') : t('table.projects.restore')"
+                  :aria-label="p.status === 'active' ? t('table.projects.archive') : t('table.projects.restore')"
                   @click="toggleArchive($event, p)"
                 >
                   <svg v-if="p.status === 'active'" width="13" height="13" viewBox="0 0 13 13" fill="none">
@@ -244,6 +246,7 @@ async function toggleArchive(e: MouseEvent, project: Project) {
                   variant="danger"
                   size="sm"
                   :loading="deletingId === p.id"
+                  :aria-label="t('confirm.deleteTitle')"
                   @click="confirmDelete($event, p.id)"
                 >
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">

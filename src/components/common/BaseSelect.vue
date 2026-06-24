@@ -12,6 +12,7 @@ interface Props {
   error?: string
   id?: string
   required?: boolean
+  ariaLabel?: string
 }
 
 defineProps<Props>()
@@ -34,6 +35,7 @@ const emit = defineEmits<{
       <select
         :id="id"
         :value="modelValue"
+        :aria-label="ariaLabel"
         :class="['field__select', { 'field__select--error': error }]"
         @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
         @blur="emit('blur')"

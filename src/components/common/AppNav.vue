@@ -112,7 +112,7 @@ function toggle() {
   &__badge {
     font-size: var(--text-caption);
     font-weight: var(--font-weight-medium);
-    color: var(--color-ash);
+    color: var(--color-silver);
     background: var(--color-graphite);
     border: 1px solid var(--color-iron);
     border-radius: var(--radius-full);
@@ -187,7 +187,7 @@ function toggle() {
     font-family: var(--font-inter);
     font-size: var(--text-caption);
     font-weight: var(--font-weight-medium);
-    color: var(--color-ash);
+    color: var(--color-silver);
     transition: color var(--transition-fast);
 
     &--active {

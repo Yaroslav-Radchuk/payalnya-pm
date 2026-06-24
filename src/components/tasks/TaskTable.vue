@@ -101,6 +101,7 @@ function isPast(d: string) {
       <BaseSelect
         :model-value="extra.status ?? ''"
         :options="statusOptions"
+        :aria-label="t('table.tasks.status')"
         @update:model-value="setExtra('status', $event)"
       />
     </div>
@@ -192,6 +193,7 @@ function isPast(d: string) {
                   <BaseButton
                     variant="ghost"
                     size="sm"
+                    :aria-label="t('project.editTask')"
                     @click="editingTask = task"
                   >
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -201,6 +203,7 @@ function isPast(d: string) {
                   <BaseButton
                     variant="danger"
                     size="sm"
+                    :aria-label="t('confirm.deleteTaskTitle')"
                     @click="removeTask(task.id)"
                   >
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -354,7 +357,7 @@ function isPast(d: string) {
     transition: background var(--transition-fast);
 
     &--muted {
-      color: var(--color-ash);
+      color: var(--color-silver);
     }
 
     &--name {
